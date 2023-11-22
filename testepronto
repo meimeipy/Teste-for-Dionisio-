@@ -1,0 +1,35 @@
+from flask import Flask, request
+import json
+
+
+app = Flask (__name__)
+
+#criar a primeira pagina 
+#route -> hashtagtreinamentos.com/
+#função -> oque a pagina vai exibir 
+
+@app.route("/processar_requisicao", methods=["POST"])
+def process_request():
+     # Recebe a requisição HTTP
+    data = request.get_json()
+
+    # Armazena a requisição em um arquivo de texto
+    with open("log.txt", "a") as f:
+        f.write(json.dumps(data))
+
+    # Transforma a requisição no formato aceito pelo JSONPlaceholder
+    transformed_data = {
+        "id": data["content"].split(",")[0],
+        "title": data["content"].split(",")[1],
+        "body": data["content"].split(",")[2],
+        "userId": data["content"].split(",")[3],
+    }
+
+    # Envia a requisição para o servidor do JSONPlaceholder
+    response = request.post("https://jsonplaceholder.typicode.com/posts", json=transformed_data)
+
+    # Devolvo a resposta do servidor do JSONPlaceholder
+    return response.json()
+
+if __name__ == "__main__":
+    app.run(debug=True)
